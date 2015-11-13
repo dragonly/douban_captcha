@@ -28,27 +28,23 @@ def binarize_cv():
     #    plt.title(titles[i])
     #    plt.xticks([]), plt.yticks([])
         cv2.imwrite(titles[i] + '.jpg', images[i])
-    #plt.show()
+    #    plt.show()
 
-def binarize(img, threshold):
-    gray_img = Image.new('L', img.size, 0)
-    w, h = img.size
-    gray_data = gray_img.load()
-    print(gray_data)
-    gray_data = cv2.dilate(gray_data, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
-    img_data = img.load()
-    for x in range(w):
-        for y in range(h):
-            gray_data[x, y] = 255 * (img_data[x, y][0] > threshold or
-                                     img_data[x, y][1] > threshold or
-                                     img_data[x, y][2] > threshold)
-    return gray_img
+def binarize(image_color, threshold):
+    X, Y = image_color.shape[:2]
+    image_bin = np.zeros(image_color.shape)
+    image_dilated = cv2.dilate(image_color, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
+    for x in range(X):
+        for y in range(Y):
+            image_bin[x, y] = 255 * (image_dilated[x, y, 0] > threshold or
+                                     image_dilated[x, y, 1] > threshold or
+                                     image_dilated[x, y, 2] > threshold)
+    return image_bin
 
-def remove_connected_black(gray_img):
-    X, Y = gray_img.size
+def remove_connected_black(image_bin):
+    X, Y = image_bin.shape
     gray_data = gray_img.load()
-    span_img = Image.new('L', gray_img.size, 255)
-    span_data = span_img.load()
+    image_span = np.zeros()
     depth = [80, 160]
     index = 0
     stats = []
@@ -88,11 +84,13 @@ def remove_connected_black(gray_img):
     return span_img
 
 def main1():
-    img = Image.open('0.jpg')
-    gray_img = binarize(img, 60)
-    span_img = remove_connected_black(gray_img)
-    gray_img.show()
-    span_img.show()
+    image_color = cv2.imread('0.jpg', cv2.IMREAD_COLOR)
+    image_gray = cv2.cvtColor(image_color, cv2.COLOR_RGB2GRAY)
+    image_bin = binarize(image_raw, 60)
+    # image_span = remove_connected_black(image_bin)
+    cv2.imwrite('gray.jpg', image_gray)
+    cv2.imwrite('bin.jpg', image_bin)
+    # cv2.imwrite('span.jpg', image_span)
 #    plt.show()
 
 def main2():
