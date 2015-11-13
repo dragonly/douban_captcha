@@ -15,6 +15,7 @@ def binarize_cv():
     in_name = '0'
     image_raw = cv2.imread('%s.jpg' % in_name, cv2.IMREAD_COLOR)
     image_gray = cv2.cvtColor(image_raw, cv2.COLOR_RGB2GRAY)
+    # image_gray = cv2.dilate(image_gray, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
     image_bin_mean = cv2.adaptiveThreshold(image_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, BLOCK_SIZE, C)
     image_bin_gaussian = cv2.adaptiveThreshold(image_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, BLOCK_SIZE, C)
 
@@ -33,6 +34,8 @@ def binarize(img, threshold):
     gray_img = Image.new('L', img.size, 0)
     w, h = img.size
     gray_data = gray_img.load()
+    print(gray_data)
+    gray_data = cv2.dilate(gray_data, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
     img_data = img.load()
     for x in range(w):
         for y in range(h):
@@ -65,7 +68,7 @@ def remove_connected_black(gray_img):
                     and (xx, yy) not in q:
                     q.append((xx, yy))
 #            print([(x,y) for (x,y) in q])
-        
+
     for x in range(X):
         for y in range(Y):
             # skip white or spanned pixels
@@ -96,4 +99,4 @@ def main2():
     binarize_cv()
 
 if __name__ == '__main__':
-    main2()
+    main1()
